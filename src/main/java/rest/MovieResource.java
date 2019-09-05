@@ -55,14 +55,33 @@ public class MovieResource {
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON})
     public String getByID(@PathParam("id") Long id) throws Exception {
-        return GSON.toJson(FACADE.getMovieByID(id));
+        try {
+            return GSON.toJson(FACADE.getMovieByID(id));
+        } catch (Exception exception) {
+            return String.format("{\"%d\":\"Movie does not exist\"}", id);
+        }
     }
 
     @GET
-    @Path("/{id}/details")
+    @Path("/details/{id}")
     @Produces({MediaType.APPLICATION_JSON})
-    public String getByIDDetailed(Movie entity, @PathParam("id") Long id) throws Exception {
-        return GSON.toJson(FACADE.getMovieByIDDetailed(id));
+    public String getByIDDetailed(@PathParam("id") Long id) throws Exception {
+        try {
+            return GSON.toJson(FACADE.getMovieByIDDetailed(id));
+        } catch (IllegalArgumentException ex) {
+            return String.format("{\"%d\":\"Movie does not exist\"}", id);
+        }
+    }
+
+    @GET
+    @Path("/name/{name}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getByName(@PathParam("name") String name) throws Exception {
+        try {
+            return GSON.toJson(FACADE.getMovieDTOByName(name));
+        } catch (IllegalArgumentException ex) {
+            return "{\"" + name + "\":\"Movie does not exist\"}";
+        }
     }
 
     @GET

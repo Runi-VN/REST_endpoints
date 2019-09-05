@@ -9,8 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import org.eclipse.persistence.jpa.jpql.Assert;
+import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeAll;
 import utils.EMF_Creator.DbSelector;
 import utils.EMF_Creator.Strategy;
@@ -135,6 +138,35 @@ public class MovieFacadeTest {
 
         //If everything worked out, lets delete the movie before next test runs.
         facade.removeMovie(expResult);
+    }
+
+    @org.junit.jupiter.api.Test
+    public void testGetMovieDTOByName() throws Exception {
+        //Arrange
+        MovieDTO expResult = new MovieDTO(movies.get(1));
+        MovieDTO result;
+        String name = "The Two Towers";
+        //Act
+        result = facade.getMovieDTOByName(name);
+        //Assert
+        assertNotNull(result);
+        assertEquals(expResult, result);
+
+    }
+
+    @org.junit.jupiter.api.Test
+    public void testGetMovieDTOByWrongName() throws Exception {
+        //Arrange
+        Throwable expResult = new IllegalArgumentException("Couldn't find movie with that name.");
+        Throwable result;
+        String name = "Peter Plys";
+        //Act
+
+        result = assertThrows(IllegalArgumentException.class, () -> {
+            facade.getMovieDTOByName(name);
+        });
+        //Assert
+        assertEquals(expResult.getMessage(), result.getMessage()); //can't test better for now...
     }
 
     // Setup the DataBase in a known state BEFORE EACH TEST

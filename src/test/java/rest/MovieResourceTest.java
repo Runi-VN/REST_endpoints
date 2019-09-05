@@ -5,12 +5,14 @@ import utils.EMF_Creator;
 import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
 import io.restassured.parsing.Parser;
+import java.io.IOException;
 import java.net.URI;
 import java.sql.Date;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.util.HttpStatus;
@@ -77,19 +79,22 @@ public class MovieResourceTest {
         m1 = new Movie("The Fellowship of the Ring", Date.valueOf("2001-12-19"), 10, 100000);
         m2 = new Movie("The Two Towers", Date.valueOf("2002-12-18"), 9, 123455678);
         m3 = new Movie("The Return of the King", Date.valueOf("2003-12-17"), 8, 999999999);
-        movies = new LinkedList<>();
+        movies = new ArrayList<>();
         movies.add(m1);
         movies.add(m2);
         movies.add(m3);
         try {
             em.getTransaction().begin();
-            em.createNamedQuery("Movie.deleteAllRows").executeUpdate();
+            //em.createNamedQuery("Movie.deleteAllRows");
+            Query query = em.createNativeQuery("TRUNCATE TABLE moviedb_test.MOVIE;"); //deletes table data but not table. ((need to reset ID))
+            query.executeUpdate();
             em.getTransaction().commit();
             for (Movie m : movies) {
                 em.getTransaction().begin();
                 em.persist(m);
                 em.getTransaction().commit();
             }
+
         } finally {
             em.close();
         }
@@ -101,7 +106,6 @@ public class MovieResourceTest {
         given().when().get("/movies").then().statusCode(200);
     }
 
-    @Disabled
     @Test
     public void testDummyMsg() throws Exception {
         given()
@@ -126,20 +130,60 @@ public class MovieResourceTest {
     public void testGetByID() throws Exception {
         given()
                 .contentType("application/json")
-                .get("/movies/{id}", m1.getId()).then()
+                .get("/movies/{id}", m1.getId()).then().log().body()
                 .assertThat()
                 .statusCode(HttpStatus.OK_200.getStatusCode())
-                .body("movie.name", equalTo(m1.getName()));
+                .body("movieName", equalTo(m1.getName()));
     }
 
     @Test
     public void testGetByIDDetailed() throws Exception {
+        System.out.println("/movies/details/{id}" + m2.getId());
         given()
                 .contentType("application/json")
-                .get("/movies/{id}/details", m2.getId()).then()
+                .get("/movies/details/{id}", m2.getId()).then().log().body()
                 .assertThat()
                 .statusCode(HttpStatus.OK_200.getStatusCode())
-                .body("name", equalTo(m2.getName()));
+                .body("name", equalTo(m2.getName()))
+                .body("earnings", equalTo(m2.getEarnings()));
+    }
+    
+    @Test
+    public void testGetByIDWrong() throws Exception {
+        given()
+                .contentType("application/json")
+                .get("/movies/{id}", 99).then().log().body()
+                .assertThat()
+                //.statusCode(HttpStatus.OK_200.getStatusCode())
+                .body("99", equalTo("Movie does not exist"));
+
+        //.body("earnings", equalTo(m2.getEarnings()));
+    }
+    
+    @Test
+    public void testGetByName() throws Exception {
+        given()
+                .contentType("application/json")
+                .get("/movies/name/{name}", m1.getName()).then().log().body()
+                .assertThat()
+                //.statusCode(HttpStatus.OK_200.getStatusCode())
+                .body("movieName", equalTo(m1.getName()));
+    }
+    @Test
+    public void testGetByNameWrong() throws Exception {
+        given()
+                .contentType("application/json")
+                .get("/movies/name/{name}", "PeterPlys").then().log().body()
+                .assertThat()
+                //.statusCode(HttpStatus.OK_200.getStatusCode())
+                .body("PeterPlys", equalTo("Movie does not exist"));
+    }
+
+    public static void main(String[] args) throws IOException {
+        HttpServer server = startServer();
+        System.in.read();
+        server.shutdownNow();
+        System.out.println("done");
     }
 
 }

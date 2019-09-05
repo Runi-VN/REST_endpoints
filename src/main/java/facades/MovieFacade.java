@@ -52,7 +52,7 @@ public class MovieFacade {
             return movie;
         } catch (Exception ex) {
             em.getTransaction().rollback();
-            throw new Exception("Could not add movie: " + ex.getMessage());
+            throw new IllegalArgumentException("Could not add movie: " + ex.getMessage());
         } finally {
             em.close();
         }
@@ -68,7 +68,7 @@ public class MovieFacade {
             return movie;
         } catch (Exception ex) {
             em.getTransaction().rollback();
-            throw new Exception("Could not add movie: " + ex.getMessage());
+            throw new IllegalArgumentException("Could not add movie: " + ex.getMessage());
         } finally {
             em.close();
         }
@@ -80,7 +80,7 @@ public class MovieFacade {
             return em.createQuery("SELECT new dto.MovieDTO(m) FROM Movie m", MovieDTO.class).getResultList();
         } catch (Exception ex) {
             em.getTransaction().rollback();
-            throw new Exception("Could not retrieve movies: " + ex.getMessage());
+            throw new IllegalArgumentException("Could not retrieve movies: " + ex.getMessage());
         } finally {
             em.close();
         }
@@ -90,9 +90,9 @@ public class MovieFacade {
         EntityManager em = getEntityManager();
         try {
             return new MovieDTO(em.find(Movie.class, id));
-//        } catch (Exception ex) {
-//            em.getTransaction().rollback();
-//            throw new Exception("Could not retrieve specific movie: " + ex.getMessage());
+        } catch (IllegalStateException | NullPointerException ex) {
+            em.getTransaction().rollback();
+            throw new IllegalArgumentException("Could not retrieve specific movie: " + ex.getMessage());
         } finally {
             em.close();
         }
@@ -105,13 +105,14 @@ public class MovieFacade {
      * @return
      * @throws java.lang.Exception
      */
-    public Movie getMovieByIDDetailed(Long id) throws Exception {
+    public Movie getMovieByIDDetailed(Long id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(Movie.class, id);
         } catch (Exception ex) {
             em.getTransaction().rollback();
-            throw new Exception("Could not retrieve specific movie: " + ex.getMessage());
+            return null;
+            //throw new Exception("Could not retrieve specific movie: " + ex.getMessage());
         } finally {
             em.close();
         }
@@ -123,6 +124,17 @@ public class MovieFacade {
             em.getTransaction().begin();
             em.remove(em.merge(movie)); //first we merge ("find"), then we remove
             em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+    }
+
+    public MovieDTO getMovieDTOByName(String name) throws Exception {
+        EntityManager em = getEntityManager();
+        try {
+            return em.createQuery("SELECT new dto.MovieDTO(m) FROM Movie m where m.name LIKE :name ", MovieDTO.class).setParameter("name", name).getSingleResult();
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Couldn't find movie with that name.");
         } finally {
             em.close();
         }
