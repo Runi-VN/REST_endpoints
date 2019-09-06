@@ -4,6 +4,9 @@ Travis CI for monday + tuesday assignment: [![Build Status](https://travis-ci.or
 
 Project was moved to an external directory due to travis issues.
 
-It contains both monday tasks (setting up) and tuesday tasks (testing REST endpoints w/ RestAssured)
+It contains:
+- monday tasks (setting up)
+- tuesday tasks (testing REST endpoints w/ RestAssured)
+- friday tasks (fetching rest endpoints)
 
 ### Deployment: https://runivn.dk/devops/
