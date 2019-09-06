@@ -9,4 +9,7 @@ It contains:
 - tuesday tasks (testing REST endpoints w/ RestAssured)
 - friday tasks (fetching rest endpoints)
 
+Parent directory: 
+https://github.com/Runi-VN/3rdsemester/tree/master/Week36
+
 ### Deployment: https://runivn.dk/devops/
