@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Overview</title>
+        <title>Week 36</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
         <h1>Overview</h1>
-        <h2>Task for monday 02-09-2019. <a href="https://www.github.com/runi-vn">Github profile</a></h2>
+        <h2>Task for Week 36. <a href="https://www.github.com/runi-vn">Github profile</a></h2>
         <h3>REST endpoints:</h3>
         <ul>
             <li><a href="api/movies/">Populate the DB</a></li>
@@ -19,5 +19,34 @@
             <li><a href="api/movies/1">See movie stats (MovieDTO-object (limited))</a></li>
             <li><a href="api/movies/details/1">See detailed movie stats (Movie-object (includes earnings))</a></li>
         </ul>
-    </body>
+
+        <h2>Task for friday 06-09-2019.</h2>
+        <h7>FETCH TIME</h7>
+        <h6>Suggestions for names, ID's (or go to all movies for inspiration)</h6>
+        <ul>
+            <li>IDs:</li>
+            <ul>
+                <li>1</li>
+                <li>2</li>
+                <li>3</li>
+            </ul>
+            <li>Names:</li>
+            <ul>
+                <li>The Two Towers</li>
+                <li>The Return of the King</li>
+                <li>The Fellowship of the Ring</li>
+            </ul>
+        </ul>
+        <div>
+            <label for="inputquery">Input ID or name</label>
+            <input type="text" id ="queryID">
+            <button type="button" id="btnId">Get by ID</button>
+            <button type="button" id="btnName">Get by Name</button>
+            <button type="button" id="btnAll">Get All</button>
+        </div>
+        <pre id="output"></pre>
+
+
+        <script src="js/friday.js" type="text/javascript"></script>
+</body>
 </html>
